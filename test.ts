@@ -1,4 +1,4 @@
-import { App } from './mod.ts';
+import { App } from "./mod.ts";
 import { Logger } from "https://deno.land/x/waterlog@v1.0.0/mod.ts";
 
 const app = new App();
@@ -6,15 +6,17 @@ app.useLogger(new Logger("app", true));
 const mainLogger = new Logger("main", true);
 
 app.get(/^\/$/, async (match, req) => {
-    await req.respondWith(new Response("At home! ūnīcōdē", {status: 200}));
+  await req.respondWith(new Response("At home! ūnīcōdē", { status: 200 }));
 });
 
 app.get(/^\/other-path$/, async (match, req) => {
-    await req.respondWith(new Response('Hi', {status: 200}));
+  await req.respondWith(new Response("Hi", { status: 200 }));
 });
 
 app.use404(async (req) => {
-    await req.respondWith(new Response(`
+  await req.respondWith(
+    new Response(
+      `
 <!doctype html>
 <html>
 <head>
@@ -46,8 +48,11 @@ app.use404(async (req) => {
     <span>Not Found</span>
 </body>
 </html>
-    `, {status: 404, headers: {'Content-Type': 'text/html'}}));
-})
+    `,
+      { status: 404, headers: { "Content-Type": "text/html" } },
+    ),
+  );
+});
 
-app.serve({port: 8081});
+app.serve({ port: 8081 });
 mainLogger.info("Started server.");

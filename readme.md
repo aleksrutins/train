@@ -22,7 +22,7 @@ app.useLogger(new Logger("app", true));
 ```
 Then, you can add routes with `useCustom`, `get`, and `post` (which take regular expressions for paths):
 ```typescript
-app.get(/^\/$/, (match, req) => { // HTTP GET /, match is the RegExpMatchArray for the URL, and req is a normal std/http ServerRequest object.
+app.get(/^\/$/, (match, req) => { // HTTP GET /, match is the RegExpMatchArray for the URL, and req is a Deno.RequestEvent object
     // Handle the request.
 });
 app.post(/^\/post-test$/, (match, req) => { // HTTP POST /post-test
@@ -33,6 +33,15 @@ app.post(/^\/post-test$/, (match, req) => { // HTTP POST /post-test
 app.useCustom(/^\/custom-test$/, async (match, req) => {
     // You can even return an async function!
 }, 'PUT'); // Method goes way down here
+```
+You can add custom error pages using `use404` and `use500`. These take an `ErrorMiddleware` handler, which takes no path match array:
+```typescript
+app.use404(async (req) => {
+    // send a response
+});
+app.use500(async (req) => {
+    // send a response
+});
 ```
 Then, start the server:
 ```typescript

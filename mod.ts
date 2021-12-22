@@ -1,4 +1,8 @@
-import { Middleware, PredefinedMiddleware, ErrorMiddleware } from "./middleware.ts";
+import {
+  ErrorMiddleware,
+  Middleware,
+  PredefinedMiddleware,
+} from "./middleware.ts";
 import { Logger, StubLogger } from "./logger.ts";
 
 /**
@@ -7,8 +11,10 @@ import { Logger, StubLogger } from "./logger.ts";
 export class App {
   #md: PredefinedMiddleware[] = [];
   #logger: Logger = new StubLogger();
-  #err404: ErrorMiddleware = (req) => req.respondWith(new Response('404 Not Found', {status: 404}));
-  #err500: ErrorMiddleware = (req) => req.respondWith(new Response('500 Internal Server Error', {status: 500}));
+  #err404: ErrorMiddleware = (req) =>
+    req.respondWith(new Response("404 Not Found", { status: 404 }));
+  #err500: ErrorMiddleware = (req) =>
+    req.respondWith(new Response("500 Internal Server Error", { status: 500 }));
 
   /**
    * Use a custom piece of middleware.
@@ -28,10 +34,10 @@ export class App {
   }
 
   use404(mw: ErrorMiddleware) {
-      this.#err404 = mw;
+    this.#err404 = mw;
   }
   use500(mw: ErrorMiddleware) {
-      this.#err500 = mw;
+    this.#err500 = mw;
   }
   /**
    * Add a piece of middleware for HTTP GET requests.
@@ -61,22 +67,22 @@ export class App {
     for await (const reqEv of httpConn) {
       const req = reqEv.request;
       try {
-      let hasRunAnything = false;
-      for (const mw of this.#md) {
+        let hasRunAnything = false;
+        for (const mw of this.#md) {
           const url = new URL(req.url);
-        this.#logger.debug(`${req.method} ${url.pathname}`);
-        const match = url.pathname.match(mw.path);
-        if (match && req.method == mw.method) {
+          this.#logger.debug(`${req.method} ${url.pathname}`);
+          const match = url.pathname.match(mw.path);
+          if (match && req.method == mw.method) {
             hasRunAnything = true;
-          await mw.mw(match, reqEv);
+            await mw.mw(match, reqEv);
+          }
         }
-      }
-      if(!hasRunAnything) {
+        if (!hasRunAnything) {
           await this.#err404(reqEv);
-      }
-    } catch(_e) {
+        }
+      } catch (_e) {
         await this.#err500(reqEv);
-    }
+      }
     }
   }
   /**
@@ -86,9 +92,9 @@ export class App {
   serve(opts: Deno.ListenOptions) {
     const server = Deno.listen(opts);
     (async () => {
-        for await (const conn of server) {
-            this.#handle(conn);
-        }
+      for await (const conn of server) {
+        this.#handle(conn);
+      }
     })();
     this.#logger.debug(
       `Serving on http://${opts.hostname ?? "0.0.0.0"}:${opts.port}`,
